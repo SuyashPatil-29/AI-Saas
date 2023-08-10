@@ -6,11 +6,12 @@ import { useForm } from 'react-hook-form'
 
 import axios from 'axios'
 
+import ReactMarkdown from 'react-markdown'
+
 import * as z from 'zod'
 import { formSchema } from './constants'
 import {zodResolver} from '@hookform/resolvers/zod'
 
-import {BiMessageDetail} from 'react-icons/bi'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
@@ -20,9 +21,10 @@ import { Loader } from '@/components/loader'
 import { cn } from '@/lib/utils'
 import { UserAvatar } from '@/components/UserAvatar'
 import { BotAvatar } from '@/components/BotAvatar'
+import { FaCode } from 'react-icons/fa'
 
 
-const ConversationPage = () => {
+const CodePage = () => {
 
   const router = useRouter()
 
@@ -42,7 +44,7 @@ const ConversationPage = () => {
       const userMessage: ChatCompletionRequestMessage = { role: "user", content: values.prompt };
       const newMessages = [...messages, userMessage];
       
-      const response = await axios.post('/api/conversation', { messages: newMessages });
+      const response = await axios.post('/api/code', { messages: newMessages });
       setMessages((current) => [...current, userMessage, response.data]);
       
       form.reset();
@@ -57,11 +59,11 @@ const ConversationPage = () => {
   return (
     <div className='pb-20'>
         <Heading 
-        title='Conversation'
-        description='Our Most Advanced Conversation Model'
-        icon={BiMessageDetail}
-        iconColor='text-violet-500'
-        bgColor='bg-violet-500/10'
+        title='Code Generation'
+        description='Generate Code using GPT-3.5 Turbo'
+        icon={FaCode}
+        iconColor='text-green-700'
+        bgColor='bg-green-700/10'
         />
         <div className='px-4 lg:px-8'>
           <div>
@@ -74,10 +76,10 @@ const ConversationPage = () => {
                     render={({field}) => (
                       <FormItem className='col-span-12 lg:col-span-10'>
                         <FormControl className='m-0 p-0'>
-                          <Input className='border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent'
+                          <Input className='border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent p-6'
                             disabled={isLoading}
                             autoComplete='off'
-                            placeholder='How do I calculate the radius of a circle?'
+                            placeholder='Binary Search on a 2D sorted array'
                             {...field}
                           />
                         </FormControl>
@@ -100,11 +102,22 @@ const ConversationPage = () => {
               <div 
                 key={message.content} 
                 className={cn("w-full flex", message.role === "user" ? "justify-end" : "justify-start")}>
-                <div className='flex items-center gap-x-8 border border-black/10 rounded-xl pl-4 p-6'>
-                {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
-                <p className="text-sm">
-                  {message.content}
-                </p>
+                <div className={cn('flex max-w-full items-start gap-x-8 border rounded-xl pl-4 p-6', message.role === "user" ? "border-green-700 md:border-black/10" : "border-red-700 md:border-black/10")}>
+                <div className={"md:block hidden"}>
+                  {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
+                </div>
+                <ReactMarkdown components={{
+                  pre: ({ node, ...props }) => (
+                    <div className="overflow-auto w-full my-2 bg-slate-800 text-white p-4 rounded-lg">
+                      <pre {...props} />
+                    </div>
+                  ),
+                  code: ({ node, ...props }) => (
+                    <code className="bg-slate-800 text-white md:p-2 p-1 rounded-lg" {...props} />
+                  )
+                }} className="text-sm overflow-hidden leading-7">
+                  {message.content || ""}
+                </ReactMarkdown>
                 </div>
               </div>
             ))}
@@ -120,4 +133,4 @@ const ConversationPage = () => {
   )
 }
 
-export default ConversationPage
+export default CodePage

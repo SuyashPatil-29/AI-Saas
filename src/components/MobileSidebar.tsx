@@ -1,26 +1,25 @@
 "use client"
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import { Button } from './ui/button'
 import { AiOutlineMenu } from 'react-icons/ai'
 
 import {
     Sheet,
     SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
     SheetTrigger,
   } from "@/components/ui/sheet"
 import Sidebar from './Sidebar'
 
 const MobileSidebar = () => {
-    const [isMounted, setIsMounted] = React.useState(false)
+    const [isMounted, setIsMounted] = useState(false);
 
-  React.useEffect(() => {
-    setIsMounted(true)
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
   }
-  , [])
-  if (!isMounted) return null;
 
   return (
     <Sheet>
